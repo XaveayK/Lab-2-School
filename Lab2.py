@@ -283,14 +283,14 @@ class deck:
     Returns: None
     '''
     def __init__(self, Face = ['C', 'S', 'D', 'H'], \
-        Value = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']):
+        Value = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']):
         Dek = []
         for face in Face:
             for value in Value:
                 Dek.append(card(face, value))
         shuffle(Dek)
         self._Deck = Dek
-        self._Face = face
+        self._Face = Face
         self._Value = Value
         
         
@@ -327,7 +327,7 @@ class deck:
             TypeError - adding to the deck has to be a card object or somethign 
             that looks like a card
     Pre: That the thing you're trying to add to the deck is a card or something 
-         that looks like a card
+         that looks like a card, or a list with cards in it
     Post: The added to deck
     Returns: None
     '''
@@ -342,8 +342,8 @@ class deck:
         elif isinstance(other, str): #if the item is a string
             #creates a card object and replaces the string with that object
             if other[0] in self._Face or other[1] in self._Value:
-                other = card(other[0], other[1])
-                self._Deck.append(other)
+                other = card(other[0], other[1]) #Makes the card object
+                self._Deck.append(other) #Adds it to the deck
                 
         
         elif isinstance(other, list): #If what you're entering is a list
@@ -351,21 +351,29 @@ class deck:
                 
                 #if the item is a str and only has 2 values
                 if isinstance(other[cards], str) and len(other[cards]) == 2: 
-                    
                     #makes the item that isnt a card object, a card object
-                    if other[cards][0] in self._Face or other[cards][1] \
-        in self._Value: other[cards] = card(other[cards][0], other[cards][1])
-                    
-                    #If it doesn't fit these parameters, raises exception
-                    else: raise Exception("Face and Value must be in the decks range")
+                    if len(other[cards]) == 2:
+                        if other[cards][0] in self._Face and other[cards][1] in \
+                           self._Value: other[cards] = card(other[cards][0], other[cards][1])
+                    elif len(other[cards]) == 3:
+                        if other[cards][0] in self._Face and other[cards][1:] in \
+                           self._Value: other[cards] = card(other[cards][0], other[cards][1:])
                 
-                elif isinstance(cards, card): pass #If the type is card, does nothing
+                #If the type is card, does nothing
+                elif isinstance(cards, card): other[cards] = other[cards]
+                
+                #If it doesn't fit these parameters, raises exception
+                else:
+                    print(self._Face, self._Value)
+                    print("THIS IS OTHER", other[cards], type(other[cards]))
+                    raise TypeError("Each item in the list must be a card or str for a card")
+                
             self._Deck += other
             other.clear()            
                 
-        #Raises type error if the list items arent cards or string
-        else: raise TypeError("Adding to a deck must be a card object, string or\
-a list with strings and card objects in it.")            
+        #Raises type error if the items arent cards or string or list
+        else: raise TypeError("Adding to a deck must be a card object, string or" +\
+                              " a list with strings and card objects in it.")            
 
         shuffle(self._Deck)    
                 
@@ -402,10 +410,19 @@ class card:
     Returns: None
     '''
     def __init__(self, Face, Value):
-        if Value in 'A2345678910JQK':
-            self._Face = Face
-            self._Value = Value
-        else: raise Exception("Needs to be in the norm for card values (A-K)")
+        
+        VAM = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+        
+        if Value.upper() == 'A': Value = '1' #Changes an Ace to 1
+        elif Value.upper() == 'J': Value = '11' #changes J to 11
+        elif Value.upper() == 'Q': Value = '12' #Changes Q to 12
+        elif Value.upper() == 'K': Value = '13' #Changes K to 13
+        
+        if Value in VAM: #Makes sure value exists
+            self._Face = Face #Stores the face of the card for the object
+            self._Value = Value #Stores the value of the object
+        
+        else: raise Exception("Needs to be in the norm for card values (1-13)")
     
     
     '''
@@ -416,21 +433,28 @@ class card:
     Post: str representation of self._Face and self._Value
     Returns: the str representation of self._Face and self._Value
     '''
-    def __str__(self): return str(self._Face + self._Value) #The string value
+    def __str__(self): 
+        if self._Value == '1': return str(self._Face + 'A') #Returns FA
+        elif self._Value == '11': return str(self._Face + 'J') #Returns FJ
+        elif self._Value == '12': return str(self._Face + "Q") #Returns FQ
+        elif self._Value == '13': return str(self._Face + 'K') #Returns FK
+        else: return str(self._Face + self._Value) #Returns the face with number
     
     
     '''
     Purpose: Checks if the cards values are equal
     Parameters: self - the inside object 
                 other - the outside object
-    Throws: TypeError - must be a card type
+    Throws: TypeError - must be a card type or int type
     Pre: Two different cards
     Post: if they are equal
     Returns: True if the values are equal
     '''
     def __eq__(self, other): 
-        if isinstance(other, card): return self._Value != other._Value
-        else: raise TypeError("A card must be compared to another card")
+        #Returns true if the values are equal, also allows for compare to int
+        if isinstance(other, card): return self._Value == other._Value 
+        elif isinstance(other, int): return self._Value == other
+        else: raise TypeError("A card must be compared to another card or int")
         
     
     '''
@@ -443,8 +467,10 @@ class card:
     Returns: True - if the values are unequal
     '''
     def __ne__(self, other): 
+        #Returns true if the values arent equal
         if isinstance(other, card): return self._Value != other._Value
-        else: raise TypeError("A card must be compared to another card")
+        elif isinstance(other, int): return self._Value != other
+        else: raise TypeError("A card must be compared to another card or int")
         
         
     '''
@@ -457,8 +483,10 @@ class card:
     Returns: True - if the self value greater than other
     '''
     def __gt__(self, other): 
+        #Returns true if the value is greater than the outside value
         if isinstance(other, card): return self._Value > other._Value 
-        else: raise TypeError("A card must be compared to another card")
+        elif isinstance(other, int): return self._Value > other
+        else: raise TypeError("A card must be compared to another card or int")
     
     
     '''
@@ -471,8 +499,10 @@ class card:
     Returns: True - if the self value greater/equal than other
     '''
     def __ge__(self, other): 
+        #Returns true if the value is greater/equal tghan the outside value
         if isinstance(other, card): return self._Value >= other._Value
-        else: raise TypeError("A card must be compared to another card")
+        elif isinstance(other, int): return self._Value >= other
+        else: raise TypeError("A card must be compared to another card or int")
     
     
     '''
@@ -485,8 +515,10 @@ class card:
     Returns: True - if the self value less than other
     '''
     def __lt__(self, other): 
+        #Returns true if the value is less than the outside value
         if isinstance(other, card): return self._Value < other._Value
-        else: raise TypeError("A card must be compared to another card")
+        elif isinstance(other, int): return self._Value < other
+        else: raise TypeError("A card must be compared to another card or int")
     
     
     '''
@@ -499,11 +531,10 @@ class card:
     Returns: True - if the self value less than/equal to other
     '''
     def __le__(self, other): 
-        List = 'A_________JQK' 
-        if self._Value == 'A': x = 1
-        if other._Value == 'A': y = 1
+        #Returns true if the value is less/equal than the outside value
         if isinstance(other, card): return self._Value <= other._Value
-        else: raise TypeError("A card must be compared to another card")
+        elif isinstance(other, int): return self._Value <= other
+        else: raise TypeError("A card must be compared to another card or int")
         
 
 
@@ -532,7 +563,9 @@ def test_decks():
     print("Hand 1 after adding it to the deck:", hand1)
     print("Deck after adding hand1 to it and shuffling:\n")
     print(a)
+    print()
     print("Creating a second deck.....")
+    print()
     print(b)
     print("Adding hand2 to the second deck...")
     b + hand2
