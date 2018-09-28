@@ -22,14 +22,24 @@ class Fraction:
     Pre: num and den are numbers
     Post: Objects created
     '''
-    def __init__(self, num, den):
-        Frac = []
-        value = float
+    def __init__(self, num = None, den = None):
+        Frac = [] #Sets up frac for later use
+        Sign = '+'
+        if isinstance(num, str): #If the user tryna enter a str
+            num = num.replace(" ", "") #Replaces all spaces with empty
+            if num[0] == '-': #Checks if num is negative 
+                Sign = num[0] #Adds the sign
+                num = num[1:] #Creates the new string
+            if num[0].isdigit() and num[-1].isdigit(): # Makes sure it's a frac
+                num = num.split("/") #Allows for the user to input the fraction as str
+                den = int(num[1]) #Makes denominator
+                num = int(num[0]) #Makes numerator
         if num == None or den == None: raise Exception("Must be two inputs") #input == 2
-        if den == 0: raise Exception("Denominator must not be 0")
+        if den == 0: raise Exception("Denominator must not be 0") #Den == 0
         Frac.append(num) #Appends numerator to the object list
         Frac.append(den) #Appends denominator to the object list
-        value = num / den #Gets the value for the fraction
+        if Sign == '-': value = -(num / den) #Gets value for negative
+        elif Sign == '+': value = num / den #Gets value for positive
         self._value = value #Creates the value in the object
         self._frac = Frac #Creates the fraction in the object
     
@@ -39,7 +49,10 @@ class Fraction:
     Parameters: Self
     Returns: the fraction in a string in the form of x/y
     '''
-    def __str__(self): return str(self._frac[0]) + "/" + str(self._frac[1])
+    def __str__(self): 
+        if self._value < 0.0: #If the value is negative, just displays it as such
+            return "-" + str(self._frac[0]) + "/" + str(self._frac[1])
+        if self._value >= 0.0: return str(self._frac[0]) + "/" + str(self._frac[1])
     
     
     '''
@@ -272,8 +285,10 @@ class Fraction:
     Post: the nominator becomes other
     '''
     def set_nom(self, other):
+        #Makes sure the user switch is an int or str
         if isinstance(other, int): self._Frac[0] = other
-        else: raise TypeError("Nominator must be an integer.")
+        if isinstance(other, str) and other.isdigit(): self._Frac[0] = other
+        else: raise TypeError("Nominator must be an integer or str of digits.")
         
     
     '''
@@ -285,8 +300,22 @@ class Fraction:
     Post: the denominator becomes other
     '''
     def set_den(self, other):
+        #Makes sure the user switch is an int or str
+        if isinstance(other, str) and other.isdigit() and int(other) != 0: self._Frac[1]=other
         if isinstance(other, int) and other != 0: self._Frac[1] = other
-        else: raise TypeError("Nominator must be an integer.")
-
-
-
+        else: raise TypeError("denominator must be an integer or str of digits.")
+    
+    
+'''
+Purpose: To test my Fraction class
+'''
+def test_frac():
+    frac1 = Fraction(1, 2) #Shows it works with int inputs
+    #I just did this one to show the robust nature of my constructor
+    frac2 = Fraction("   4   /  2          ")
+    frac3 = Fraction("6 / 3") # Shows it works under normal conditions
+    print("Here are our three fractions:")
+    print(frac1)
+    print(frac2)
+    print(frac3)
+    
