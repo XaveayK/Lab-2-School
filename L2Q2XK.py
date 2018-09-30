@@ -89,29 +89,29 @@ class deck:
                 
         
         elif isinstance(other, list): #If what you're entering is a list
-            for cards in range(len(other)): #For the range of the list
-                
+            x = 0
+            while x < len(other): #For the range of the list
+                x += 1
                 #if the item is a str and only has 2 values
-                if isinstance(other[cards], str) and len(other[cards]) == 2: 
+                if isinstance(other[x-1], str) and (len(other[x-1]) >= 2\
+                   or len(others[x-1] < 4)): 
+                    
                     #makes the item that isnt a card object, a card object
-                    if len(other[cards]) == 2:
-                        if other[cards][0] in self._Face and other[cards][1] in \
-                           self._Value: other[cards] = card(other[cards][0], other[cards][1])
-                    elif len(other[cards]) == 3:
-                        if other[cards][0] in self._Face and other[cards][1:] in \
-                           self._Value: other[cards] = card(other[cards][0], other[cards][1:])
+                    if len(other[x-1]) == 2:
+                        if other[x-1][0] in self._Face and other[x-1][1] in \
+                           self._Value: other[x-1] = card(other[x-1][0], other[x-1][1])
+                    elif len(other[x-1]) == 3:
+                        if other[x-1][0] in self._Face and other[x-1][1:] in \
+                           self._Value: other[x-1] = card(other[x-1][0], other[x-1][1:])
                 
                 #If the type is card, does nothing
-                elif isinstance(cards, card): other[cards] = other[cards]
+                elif isinstance(other[x-1], card): other[x-1] = other[x-1]
                 
                 #If it doesn't fit these parameters, raises exception
-                else:
-                    print(self._Face, self._Value)
-                    print("THIS IS OTHER", other[cards], type(other[cards]))
-                    raise TypeError("Each item in the list must be a card or str for a card")
+                else: raise TypeError("Each item in the list must be a card or str for a card")
                 
-            self._Deck += other
-            other.clear()            
+            self._Deck += other #adds other to the deck
+            other.clear() #clears the origin if its a list
                 
         #Raises type error if the items arent cards or string or list
         else: raise TypeError("Adding to a deck must be a card object, string or" +\
@@ -130,9 +130,9 @@ class deck:
     Returns: The created hand of cards
     '''
     def deal(self, cards = 1):
-        hand = []
-        for han in range(cards): hand.append(str(self._Deck.pop()))
-        return hand
+        hand = [] #Sets hand variable
+        for han in range(cards): hand.append(str(self._Deck.pop())) # adds card variable
+        return hand #returns the created card variables as a list
    
    
             
@@ -153,7 +153,7 @@ class card:
     '''
     def __init__(self, Face, Value):
         
-        VAM = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+        VAM = ['1','2','3','4','5','6','7','8','9','10','11','12','13']
         
         if Value.upper() == 'A': Value = '1' #Changes an Ace to 1
         elif Value.upper() == 'J': Value = '11' #changes J to 11
@@ -194,8 +194,8 @@ class card:
     '''
     def __eq__(self, other): 
         #Returns true if the values are equal, also allows for compare to int
-        if isinstance(other, card): return self._Value == other._Value 
-        elif isinstance(other, int): return self._Value == other
+        if isinstance(other, card): return self._Value == other._Value #checks card
+        elif isinstance(other, int): return self._Value == other #checks int
         else: raise TypeError("A card must be compared to another card or int")
         
     
@@ -210,8 +210,8 @@ class card:
     '''
     def __ne__(self, other): 
         #Returns true if the values arent equal
-        if isinstance(other, card): return self._Value != other._Value
-        elif isinstance(other, int): return self._Value != other
+        if isinstance(other, card): return self._Value != other._Value #checks card
+        elif isinstance(other, int): return self._Value != other #checks int
         else: raise TypeError("A card must be compared to another card or int")
         
         
@@ -226,8 +226,8 @@ class card:
     '''
     def __gt__(self, other): 
         #Returns true if the value is greater than the outside value
-        if isinstance(other, card): return self._Value > other._Value 
-        elif isinstance(other, int): return self._Value > other
+        if isinstance(other, card): return self._Value > other._Value #Checks card
+        elif isinstance(other, int): return self._Value > other #checks int
         else: raise TypeError("A card must be compared to another card or int")
     
     
@@ -242,8 +242,8 @@ class card:
     '''
     def __ge__(self, other): 
         #Returns true if the value is greater/equal tghan the outside value
-        if isinstance(other, card): return self._Value >= other._Value
-        elif isinstance(other, int): return self._Value >= other
+        if isinstance(other, card): return self._Value >= other._Value #checks card
+        elif isinstance(other, int): return self._Value >= other #checks int
         else: raise TypeError("A card must be compared to another card or int")
     
     
@@ -258,8 +258,8 @@ class card:
     '''
     def __lt__(self, other): 
         #Returns true if the value is less than the outside value
-        if isinstance(other, card): return self._Value < other._Value
-        elif isinstance(other, int): return self._Value < other
+        if isinstance(other, card): return self._Value < other._Value #checks card
+        elif isinstance(other, int): return self._Value < other #checks int
         else: raise TypeError("A card must be compared to another card or int")
     
     
@@ -274,48 +274,33 @@ class card:
     '''
     def __le__(self, other): 
         #Returns true if the value is less/equal than the outside value
-        if isinstance(other, card): return self._Value <= other._Value
-        elif isinstance(other, int): return self._Value <= other
+        if isinstance(other, card): return self._Value <= other._Value #checks card
+        elif isinstance(other, int): return self._Value <= other #checks int
         else: raise TypeError("A card must be compared to another card or int")
         
 
 
 def test_decks():
     
-    #Sets up the decks for testing
     a = deck()
-    b = deck()
-    c = deck()
-    
-    #Runs through checks for the deck and 
-    print("This is the current deck:")
+    print("This is the deck of cards with shuffle:")
     print(a)
-    hand1 = a.deal(5)
-    hand2 = a.deal(5)
-    print("Dealing two 5 card hands.....")
+    x = a.deal(1)
+    y = a.deal(1)
+    print(x, y, "are our two cards.\nIs x == y?", x == y, "\nAre they unequal?", x != y)
     print()
-    print("Hand 1 is:", hand1)        
-    hand1.append('C6')
-    hand1.append('S8')    
-    print("Hand 2 is:", hand2)
-    print("Manually added two strings to hand1:", hand1)
-    print()
-    print("Now adding hand 1 to the deck.....")
-    a + hand1
-    print("Hand 1 after adding it to the deck:", hand1)
-    print("Deck after adding hand1 to it and shuffling:\n")
+    print("Both of those cards were dealt into two separate hands. Here is the\
+deck now:")
     print(a)
     print()
-    print("Creating a second deck.....")
+    print("I'll deal 30 more cards into a single hand so it's easier to notice\
+ the reduction in deck number.")
+    z = a.deal(30)
+    print(a)
+    print("Here is the hand they were dealt into:", z)
     print()
-    print(b)
-    print("Adding hand2 to the second deck...")
-    b + hand2
-    print("This is now deck b:")
-    print()
-    print(b)
-    b + 'C8'
-    print()
-    print("Adding C8 directly to deck b:")
-    print()
-    print(b)
+    print("I will now add all the hands back to the deck, and display it:")
+    a + x
+    a + y
+    a + z
+    print(a)

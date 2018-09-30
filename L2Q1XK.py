@@ -5,6 +5,8 @@ Computer Science 200 - XO2L
 Lab 2 - Classes
 '''
 
+from random import *
+
 
 
 '''
@@ -22,13 +24,53 @@ class Fraction:
     Pre: num and den are numbers
     Post: Objects created
     '''
-    def __init__(self, num, den):
-        Frac = []
+    def __init__(self, num = None, den = None):
         value = float
+        
+        #Checks if the num is a str
+        if isinstance(num, str):
+            num = num.replace(" ", '')
+            
+            #Sees if the denominator is a str
+            if isinstance(den, str):
+                den = den.replace(" ", '')
+                
+                #Makes sure their good fractions
+                if ((num[0].isdigit() or num[0] == '-') and num[-1].isdigit()) and\
+                   ((den[0].isdigit() or den[0] == '-') and den[-1].isdigit()):
+                    
+                    #Gets rid of the neg if both bottom and top are neg
+                    if den[0] == '-' and num[0] == '-':
+                        den.replace('-', '')
+                        num.replace('-', '') 
+                    
+                    #Sets up the fraction, because two fractions make one frac
+                    num = num.split('/')
+                    den = den.split('/')
+                    num[0] = int(num[0])
+                    num[1] = int(num[1])
+                    den[0] = int(den[0])
+                    den[1] = int(den[1])
+                    num = Fraction(num[0], num[1])
+                    den = Fraction(den[0], den[1])
+                    num = num / den
+                    temp = str(num).split("/")
+                    num = int(temp[0])
+                    den = int(temp[1])
+                
+                else: raise Exception("Fractions must be in form '-1 / -3'")
+            
+            #Checks if the nominator works as a fraction
+            elif (num[0].isdigit() or num[0] == '-') and num[-1].isdigit():
+                num = num.split('/')
+                den = int(num[1])
+                num = int(num[0])
+            
+            else: raise Exception("Fractions that are str must be in form '1/3'")
+                
         if num == None or den == None: raise Exception("Must be two inputs") #input == 2
         if den == 0: raise Exception("Denominator must not be 0")
-        Frac.append(num) #Appends numerator to the object list
-        Frac.append(den) #Appends denominator to the object list
+        Frac = [num, den] #Appends numerator to the object list
         value = num / den #Gets the value for the fraction
         self._value = value #Creates the value in the object
         self._frac = Frac #Creates the fraction in the object
@@ -290,3 +332,32 @@ class Fraction:
 
 
 
+def test_frac():
+    a = randint(1, 100)
+    b = randint(1, 100)
+    while a == b: a = randint(1, 100)
+    Frac0 = Fraction(a, b) #This shows it accepts nom, den
+    Frac1 = Fraction("      1   /   3 ") #This shows it accepts a str fraction
+    Frac2 = Fraction(str(Frac0), str(Frac1))
+    FUN = Fraction("1 / 5", "4 / 6")
+    print(Frac0, 'is the first fraction')
+    print(Frac1, 'is the second fraction')
+    print(Frac2, 'is the first and second fraction combined')
+    print(FUN, "This fraction was made by using ('1 / 5', '4 / 6')")
+    frac2 = Frac0 * Frac1
+    print(Frac0, "*", Frac1, "is", frac2)
+    frac3 = Frac1 / Frac0
+    print(Frac1, "/", Frac0, "is", frac3)
+    frac4 = Frac0 + Frac1
+    print(Frac0, "+", Frac1, 'is', frac4)
+    frac5 = Frac0 - Frac1
+    print(Frac0, "-", Frac1, 'is', frac5)
+    print()
+    print("Here are the comparisons:\n")
+    print(Frac0, ">", Frac1, 'is', Frac0 > Frac1)
+    print(Frac0, '<', Frac1, 'is', Frac0 < Frac1)
+    print(Frac0, '<=', Frac1, 'is', Frac0 <= Frac1)
+    print(Frac0, '>=', Frac1, 'is', Frac0 >= Frac1)
+    print(Frac0, '!=', Frac1, 'is', Frac0 != Frac1)
+    print(Frac0, '==', Frac1, 'is', Frac0 == Frac1)
+    print()
